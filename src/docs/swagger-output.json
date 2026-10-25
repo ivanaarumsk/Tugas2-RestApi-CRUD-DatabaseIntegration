@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Review Kantin API - Tugas 2",
+    "title": "Review Kantin API - Tugas 3",
     "version": "1.0.0",
     "description": ""
   },
@@ -15,6 +15,14 @@
   "schemes": [
     "http"
   ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "Isi: Bearer <token>"
+    }
+  },
   "paths": {
     "/health": {
       "get": {
@@ -110,6 +118,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
@@ -121,8 +134,19 @@
         "responses": {
           "201": {
             "description": "Warung dibuat"
+          },
+          "401": {
+            "description": "Belum login"
+          },
+          "403": {
+            "description": "Role tidak diizinkan"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/stalls/{id}": {
@@ -155,6 +179,11 @@
             "type": "integer"
           },
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
@@ -166,10 +195,49 @@
         "responses": {
           "200": {
             "description": "Warung ter-update"
+          },
+          "403": {
+            "description": "Bukan pemilik warung"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Warung terhapus"
+          },
+          "403": {
+            "description": "Hanya admin"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/stalls/{id}/menus": {
+      "get": {
         "description": "",
         "parameters": [
           {
@@ -181,9 +249,45 @@
         ],
         "responses": {
           "200": {
-            "description": "Warung terhapus"
+            "description": "Daftar menu milik warung"
           }
         }
+      }
+    },
+    "/api/v1/stalls/{id}/reviews": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReviewCreateInput"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Review dibuat"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/menu-items/": {
@@ -426,9 +530,122 @@
           }
         }
       }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterInput"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Registrasi berhasil"
+          },
+          "400": {
+            "description": "Validasi gagal"
+          },
+          "409": {
+            "description": "Email sudah terdaftar"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginInput"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login berhasil, mengembalikan token JWT"
+          },
+          "401": {
+            "description": "Email atau password salah"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profil user dari token"
+          },
+          "401": {
+            "description": "Belum login"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "definitions": {
+    "RegisterInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Ivana Chen"
+        },
+        "email": {
+          "type": "string",
+          "example": "ivana@student.test"
+        },
+        "password": {
+          "type": "string",
+          "example": "rahasia123"
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "password"
+      ]
+    },
+    "LoginInput": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "admin@kantin.test"
+        },
+        "password": {
+          "type": "string",
+          "example": "rahasia123"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
     "UserInput": {
       "type": "object",
       "properties": {
@@ -459,9 +676,21 @@
     "StallInput": {
       "type": "object",
       "properties": {
-        "ownerId": {
-          "type": "number",
-          "example": 2
+        "ReviewCreateInput": {
+          "type": "object",
+          "properties": {
+            "rating": {
+              "type": "number",
+              "example": 5
+            },
+            "comment": {
+              "type": "string",
+              "example": "Enak banget"
+            }
+          },
+          "required": [
+            "rating"
+          ]
         },
         "name": {
           "type": "string",
@@ -481,7 +710,6 @@
         }
       },
       "required": [
-        "ownerId",
         "name"
       ]
     },

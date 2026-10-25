@@ -21,6 +21,12 @@ export class UserRepository {
     return rows[0];
   }
 
+  async findByEmail(email: string) {
+    const db = await getDb();
+    const rows = await db.select().from(users).where(eq(users.email, email));
+    return rows[0];
+  }
+
   async create(input: CreateUserInput) {
     const db = await getDb();
     const rows = await db.insert(users).output().values(input);

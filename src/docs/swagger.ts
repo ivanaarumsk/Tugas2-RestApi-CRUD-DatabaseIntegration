@@ -1,9 +1,23 @@
 import swaggerAutogen from 'swagger-autogen';
 
 const doc = {
-  info: { title: 'Review Kantin API - Tugas 2', version: '1.0.0' },
+  info: { title: 'Review Kantin API - Tugas 3', version: '1.0.0' },
+  securityDefinitions: {
+    bearerAuth: { type: 'apiKey', in: 'header', name: 'Authorization', description: 'Isi: Bearer <token>' },
+  },
   servers: [{ url: 'http://localhost:3000' }],
   definitions: {
+    RegisterInput: {
+      $name: 'Ivana Chen',
+      $email: 'ivana@student.test',
+      $password: 'rahasia123',
+    },
+
+    LoginInput: {
+      $email: 'admin@kantin.test',
+      $password: 'rahasia123',
+    },
+
     UserInput: {
       $name: 'Bagas Pratama',
       $email: 'bagas2@student.test',
@@ -11,7 +25,7 @@ const doc = {
       $role: 'customer',
     },
     StallInput: {
-      $ownerId: 2,
+      ReviewCreateInput: { $rating: 5, comment: 'Enak banget' },
       $name: 'Warung Baru',
       category: 'Nasi',
       location: 'Kantin FK',

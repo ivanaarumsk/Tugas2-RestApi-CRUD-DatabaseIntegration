@@ -10,6 +10,9 @@ import { reviewRouter } from './routes/reviewRouter.ts';
 import { likeRouter } from './routes/likeRouter.ts';
 import { flagRouter } from './routes/flagRouter.ts';
 import { auditLogRouter } from './routes/auditLogRouter.ts';
+import { authRouter } from './routes/authRouter.ts';
+import { notFoundHandler } from './middlewares/notFound.ts';
+import { errorHandler } from './middlewares/errorHandler.ts';
 
 const app: Application = express();
 const PORT: number = 3000;
@@ -40,6 +43,10 @@ app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/likes', likeRouter);
 app.use('/api/v1/flags', flagRouter);
 app.use('/api/v1/audit-logs', auditLogRouter);
+app.use('/api/v1/auth', authRouter);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
